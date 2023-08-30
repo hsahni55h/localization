@@ -26,7 +26,42 @@ Kalman Filter types
 3. UKF - highly non linear
 
 -------------------------------------------------------------------------------------------------------------
+1D gaussian
 
+At the basis of the Kalman Filter is the Gaussian distribution, sometimes referred to as a bell curve or normal distribution. 
+Recall the rover example - after executing one motion, the rover’s location was represented by a Gaussian. 
+It’s exact location was not certain, but the level of uncertainty was bounded. 
+This is the role of a Kalman Filter - after a movement or a measurement update, it outputs a unimodal Gaussian distribution. 
+This is its best guess at the true value of a parameter.
+
+A Gaussian distribution is a probability distribution, which is a continuous function. 
+The probability that a random variable, x, will take a value between x1 and x2 is given by the integral of the function from x1 to x2.
+
+p (x1 < x < x2) = ∫ f(x)dx (integral from x1 to x2)
+
+
+Mean and Variance
+
+A Gaussian is characterized by two parameters - its mean (μ) and its variance (σ²). 
+The mean is the most probable occurrence and lies at the centre of the function, 
+and the variance relates to the width of the curve. 
+
+The term unimodal implies a single peak present in the distribution.
+
+Gaussian distributions are frequently abbreviated as N(x: μ, σ²), and will be referred to in this way.
+
+
+The formula for the Gaussian distribution is mentioned below. 
+
+p(x) = (1 / σ * sqrt(2π)) e^(-(x−μ)^2)/2*σ^2
+
+The formula contains an exponential of a quadratic function. 
+The quadratic compares the value of x to μ, and in the case that x=μ, the exponential is equal to 1 (e^0 =1)
+The constant in front of the exponential is a necessary normalizing factor.
+
+Just like with discrete probability, like a coin toss, the probabilities of all the options must sum to one. 
+Therefore, the area underneath the function always sums to one.
+∫p(x)dx=1
 
 
 -------------------------------------------------------------------------------------------------------------
