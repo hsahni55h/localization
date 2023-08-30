@@ -1,0 +1,10 @@
+Localization Algorithms
+
+1. Extented kalman filter - gaussian filter which helps in estimating state of non linear models
+
+2. Markov Localization - Baye's filter localization algorithm, maintains a probability distribution over the set of
+                        all possble positions and orientations where the robot might be located at.
+
+3. Grid localization - histogram filter, since it is capable of estimating robots positions using grids
+
+4. Monte Carlo Localization - particle filter, it estimates robot location using particles 
