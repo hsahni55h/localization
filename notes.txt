@@ -15,17 +15,17 @@ Localization Challenges
 1. position tracking ( local localization) -robot knows its initial pose but the challenge entails in estimating pose 
                                             when it moves around in the environment.
 
-
-
 2. global localization - initial pose is unknown and it must estimate its pose relative to the ground truth
 
 3. kidnapped robot - robot may be moved to a new point in the map at any time 
 -------------------------------------------------------------------------------------------------------------
+Kalman Filter types
 
-
+1. KF - linear
+2. EKF - non linear
+3. UKF - highly non linear
 
 -------------------------------------------------------------------------------------------------------------
-
 
 
 
