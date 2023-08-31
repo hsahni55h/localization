@@ -63,12 +63,58 @@ Just like with discrete probability, like a coin toss, the probabilities of all 
 Therefore, the area underneath the function always sums to one.
 ∫p(x)dx=1
 
-
 -------------------------------------------------------------------------------------------------------------
 
+Variable naming conventions
+
+xt : state (x, y, theta)
+zt : measurement (from sensors)
+ut : control action
 
 
 -------------------------------------------------------------------------------------------------------------
+1D kalman filter
+
+-----------------------------------------
+Measurement update:
+-----------------------------------------
+mu: Mean of the prior belief
+sigma^{2}: Variance of the prior belief  (uncertainty of prior belief)
+
+v: Mean of the measurement
+r^{2}: Variance of the measurement (uncertainty of the measurement)
+
+The new mean is a weighted sum of the prior belief and measurement means. 
+With uncertainty, a larger number represents a more uncertain probability distribution. 
+However, the new mean should be biased towards the measurement update, which has a smaller standard deviation than the prior.
+
+μ' = (r^{2}*mu + sigma^{2}*v) / (r^{2} + sigma^{2})
+
+
+The uncertainty of the prior is multiplied by the mean of the measurement, to give it more weight, 
+and similarly the uncertainty of the measurement is multiplied with the mean of the prior.
+
+
+Next, we need to determine the variance of the new state estimate.
+The two Gaussians provide us with more information together than either Gaussian offered alone. 
+As a result, our new state estimate is more confident than our prior belief and our measurement. 
+This means that it has a higher peak and is narrower. 
+
+sigma'^{2} = 1/(1/r^{2} + 1/sigma^{2})
+
+mu: Mean of the prior belief
+sigma^{2}: Variance of the prior belief     (uncertainty of prior belief)
+
+v: Mean of the measurement
+r^{2}: Variance of the measurement      (uncertainty of the measurement)
+
+tau: Mean of the posterior
+s^{2}: Variance of the posterior
+
+
+-----------------------------------------
+State prediction
+-----------------------------------------
 
 
 
