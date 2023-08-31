@@ -118,9 +118,28 @@ State prediction
 Posterior Mean: μ' = μ1 + μ2
 Posterior Variance: σ'^2 = σ1^2 + σ2^2
 
-
 -------------------------------------------------------------------------------------------------------------
+Formulas for the Multivariate Gaussian
+
+The mean is now a vector,
+
+μ = [ μx
+    μy ]
+
+And the multidimensional equivalent of variance is a covariance matrix,
+
+Σ = [ σx^2      σyσx​
+      σxσy      σy^2 ]
+
+Where σx^2 and σy^2 represent the variances, while σyσx and σxσy are correlation terms.
+These terms are non-zero if there is a correlation between the variance in one dimension and the variance in another. 
+When that is the case, the Gaussian function looks 'skewed' when looked at from above.
+If we were to evaluate this mathematically, the eigenvalues and eigenvectors of the covariance matrix describe the amount and direction of uncertainty.
 
 
+Multivariate Gaussian
+Below is the formula for the multivariate Gaussian. Note that x and μ are vectors, and Σ is a matrix.
+
+# check the formula in the image
 
 -------------------------------------------------------------------------------------------------------------
