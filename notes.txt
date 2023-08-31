@@ -143,3 +143,136 @@ Below is the formula for the multivariate Gaussian. Note that x and μ are vecto
 # check the formula in the image
 
 -------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------
+Design of Multi-Dimensional Kalman Filters
+-----------------------------------------
+
+State Transition
+-----------------
+
+The formula below is the state transition function that advances the state from time t to time t + 1. 
+It is just the relationship between the robot’s position, x, and velocity, x(dot). 
+Here, we will assume that the robot’s velocity is not changing.
+
+x' = x + Δtx(dot)
+x'(dot) = x(dot)
+
+We can express the same relationship in matrix form, as seen below. 
+On the left, is the posterior state (denoted with the prime symbol, '), 
+and on the right are the state transition function and the prior state. 
+This equation shows how the state changes over the time period, Δt.
+Note that we are only working with the means here; the covariance matrix will appear later.
+
+
+|   x    |   =   | 1   Δt |  |  x   |
+| x(dot) |'      | 0    1 |  |x(dot)|
+
+
+The State Transition Function is denoted  by F, and the formula can be written as so,
+
+x' = Fx
+In reality, the equation should also account for process noise, as its own term in the equation. 
+However, process noise is a Gaussian with a mean of 0, so the update equation for the mean need not include it.
+
+x' = Fx + noise
+noise∼N(0,Q)
+
+Sidenote: While it is common to use Σ to represent the covariance of a Gaussian distribution in mathematics, 
+it is more common to use the letter P to represent the state covariance in localization.
+
+If you multiply the state, x, by F, then the covariance will be affected by the square of F. 
+In matrix form, this will look like so:
+
+P' = FPF^T (transpose)
+ 
+However, your intuition may suggest that it should be affected by more than just the state transition function. 
+For instance, additional uncertainty may arise from the prediction itself.
+
+To calculate the posterior covariance, the prior covariance is multiplied by the state transition function squared, and 
+Q added as an increase of uncertainty due to process noise. 
+Q can account for a robot slowing down unexpectedly, or being drawn off course by an external influence.
+
+P' = FPF^T + Q
+Now we’ve updated the mean and the covariance as part of the state prediction.
+ 
+ 
+Measurement Update
+-------------------
+Next, we move onto the measurement update step. 
+If we return to our original example, where we were tracking the position and velocity of a robot in the x-dimension, 
+the robot was taking measurements of the location only (the velocity is a hidden state variable). 
+Therefore the measurement function is very simple - a matrix containing a one and a zero. 
+This matrix demonstrates how to map the state to the observation, 
+
+z = [ 1 0] [ x
+            x(dot)]
+This matrix, called the Measurement Function, is denoted H.
+
+
+For the measurement update step, there are a few formulas. 
+First, we calculate the measurement residual, y. 
+The measurement residual is the difference between the measurement and the expected measurement based on the prediction 
+(ie. we are comparing where the measurement tells us we are vs. where we think we are). 
+The measurement residual will be used later on in a formula.
+
+y = z - Hx'
+
+Next, it's time to consider the measurement noise, denoted R.
+This formula maps the state prediction covariance into the measurement space and adds the measurement noise. 
+The result, S, will be used in a subsequent equation to calculate the Kalman Gain.
+
+S = HP'H^T + R
+
+
+
+Kalman Gain
+------------
+
+Next, we calculate the Kalman Gain, K. 
+As you will see in the next equation, the Kalman Gain determines how much weight should be placed on the state prediction, and how much on the measurement update. 
+It is an averaging factor that changes depending on the uncertainty of the state prediction and measurement update.
+
+K = P'(H^T)(S^-1)
+x = x' + Ky
+
+
+The last step in the Kalman Filter is to update the new state’s covariance using the Kalman Gain.
+P = (I - KH)P'
+
+-------------------------------------------------------------------------------------------------------------
+
+
+KALMAN FILTER EQUATIONS
+
+
+State Prediction:
+
+x' = Fx
+P' = FPF^T + Q
+
+Measurement Update:
+
+y = z - Hx'
+S = HP'H^T + R
+
+
+Calculation of Kalman Gain:
+
+K = P'(H^T)(S^-1)
+
+Calculation of Posterior State and Covariance:
+
+x = x' + Ky
+P = (I - KH)P'
+
+The Kalman Filter can successfully recover from inaccurate initial estimates, but it is very important to estimate the noise parameters, Q and R, 
+as accurately as possible - as they are used to determine which of the estimate or the measurement to believe more.
+
+
+
+-------------------------------------------------------------------------------------------------------------
+
+-----------------------
+EXTENDED KALMAN FILTER
+-----------------------
