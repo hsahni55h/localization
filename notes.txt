@@ -276,3 +276,91 @@ as accurately as possible - as they are used to determine which of the estimate 
 -----------------------
 EXTENDED KALMAN FILTER
 -----------------------
+
+The Kalman Filter is applicable to problems with linear motion and measurement functions. 
+This is limiting, as much of the real world is nonlinear.
+
+A nonlinear function can be used to update the mean of a function, but not the variance, 
+as this would result in a non-Gaussian distribution which is much more computationally expensive to work with. 
+To update the variance, the Extended Kalman Filter linearizes the nonlinear function f(x) over a small section and calls it F. 
+This linearization, F, is then used to update the state's variance.
+The linear approximation can be obtained by using the first two terms of the Taylor Series of the function centered around the mean.
+
+Now you’ve seen the fundamentals behind the Extended Kalman Filter. The mechanics are not too different from the Kalman Filter, 
+with the exception of needing to linearize a nonlinear motion or measurement function to be able to update the variance.
+
+
+
+##### Check the image linearization in multiple dimnsions #####
+
+This will make more sense in context, so let’s look at a specific example. 
+Let’s say that we are tracking the x-y coordinate of an object. 
+This is to say that our state is a vector x, with state variables x and y.
+
+x=[ x
+    y ]
+However, our sensor does not allow us to measure the x and y coordinates of the object directly. 
+Instead, our sensor measures the distance from the robot to the object, r, as well as the angle between r and the x-axis, θ.
+
+z = [ r
+      θ ]
+It is important to notice that our state is using a Cartesian representation of the world, 
+while the measurements are in a polar representation. 
+How will this affect our measurement function?
+
+Our measurement function maps the state to the observation, as so,
+
+[ x       -------->   [ r
+  y ]     -------->     θ ]
+Thus, our measurement function must map from Cartesian to polar coordinates.
+
+
+But there is no matrix, H, that will successfully make this conversion, 
+as the relationship between Cartesian and polar coordinates is nonlinear.
+
+r = sqrt(x^2 + y^2)
+θ = arctan(y/x)
+
+For this reason, instead of using the measurement residual equation 
+
+y = z − Hx'
+
+that you had seen before, the mapping must be made with a dedicated function, h(x').
+
+h(x') = [ sqrt(x^2 + y^2)
+          arctan(y/x)     ]
+
+
+Then the measurement residual equation becomes y = z − h(x').
+
+Our measurement covariance matrix cannot be updated the same way, as it would turn into a non-Gaussian distribution. 
+Let's calculate a linearization, H, and use it instead. 
+
+The Taylor series for the function h(x), centered about the mean μ, is defined below.
+h(x) ≃ h(μ) + (x−μ).T Df(μ)
+
+The Jacobian, Df(μ), is defined below. But let's call it H since it's the linearization of our measurement function, h(x).
+
+H = ⎡   ∂r/∂x   ∂r/∂y   ⎤
+    ⎣   ∂θ/∂x   ∂θ/∂y   ⎦
+
+
+If you were to compute each of those partial derivatives, the matrix would reduce to the following,
+
+
+H = ⎡   x/sqrt(x^2 + y^2)       y/sqrt(x^2 + y^2)   ⎤
+    ⎢                                               ⎥
+    ⎣   -y/(x^2 + y^2)          x/(x^2 + y^2)       ⎦
+
+
+It's this matrix, H, that can then be used to update the state's covariance.
+
+
+
+ 
+​
+  
+
+
+
+​
