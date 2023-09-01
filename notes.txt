@@ -357,10 +357,43 @@ It's this matrix, H, that can then be used to update the state's covariance.
 
 
 
- 
-​
-  
+---------------------------------
+​Extended Kalman Filter Equations
+---------------------------------
 
+State Prediction:
+
+x' = f(x)
+P' = FPF^T + Q
+
+Measurement Update:
+
+y = z − h(x')
+S = HP'H^T + R
+
+Calculation of Kalman Gain:
+
+K = P'(H^T)(S^-1)
+
+Calculation of Posterior State and Covariance:
+
+x = x' + Ky
+P = (I - KH)P'
+  
+The Extended Kalman Filter requires us to calculate the Jacobian of a nonlinear function as part of every single iteration, 
+since the mean (which is the point that we linearize about) is updated.
+
+
+The key take-aways about Extended Kalman Filters:
+
+The Kalman Filter cannot be used when the measurement and/or state transition functions are nonlinear, 
+since this would result in a non-Gaussian distribution.
+
+Instead, we take a local linear approximation and use this approximation to update the covariance of the estimate. 
+The linear approximation is made using the first terms of the Taylor Series, which includes the first derivative of the function.
+
+In the multi-dimensional case, taking the first derivative isn't as easy as there are multiple state variables and multiple dimensions. 
+Here we employ a Jacobian, which is a matrix of partial derivatives, containing the partial derivative of each dimension with respect to each state variable.
 
 
 ​
