@@ -4,8 +4,8 @@
 #include "matrix"
 
 // Kalman filter function
-std::pair<Matrix, Matrix> kalman_filter(const Matrix& x, const Matrix& P, const Matrix& u,
-                                       const Matrix& F, const Matrix& H, const Matrix& R, const Matrix& I,
+std::pair<Matrix, Matrix> kalman_filter(Matrix& x,  Matrix& P,  Matrix& u,
+                                        Matrix& F,  Matrix& H,  Matrix& R,  Matrix& I,
                                        const std::vector<double>& measurements) {
     for (size_t n = 0; n < measurements.size(); n++) {
         // Measurement Update
@@ -13,8 +13,7 @@ std::pair<Matrix, Matrix> kalman_filter(const Matrix& x, const Matrix& P, const 
         Z(0, 0) = measurements[n];
 
         Matrix y = Z - H*x; // Measurement residual
-
-        Matrix S = H * (P * H.T()) + R; // Measurement covariance
+        Matrix S = (H * P * H.T()) + R; // Measurement covariance
 
         // Calculate Kalman gain using MatrixInverse function
         Matrix K = P * H.T() * S.I(); // Kalman gain
@@ -24,7 +23,7 @@ std::pair<Matrix, Matrix> kalman_filter(const Matrix& x, const Matrix& P, const 
 
         // Prediction
         x = F * x + u;      // Predict state
-        P = F * P * F.T;    // Predict covariance
+        P = F * P * F.T();    // Predict covariance
     }
 
     return std::make_pair(x, P);

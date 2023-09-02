@@ -11,7 +11,7 @@ public:
     double& operator()(int i, int j) {
         return data[i * cols + j];
     }
-    
+
     double operator()(int i, int j) const {
         return data[i * cols + j];
     }
@@ -24,58 +24,54 @@ public:
         return cols;
     }
 
-    Matrix operator+(const Matrix& a, const Matrix& b) {
-        if (a.Rows() != b.Rows() || a.Cols() != b.Cols()) {
-            throw std::invalid_argument("Matrix dimensions are incompatible for addition");
+    Matrix operator+(const Matrix& b) {
+        if (rows != b.Rows() || cols != b.Cols()) {
+            throw std::invalid_argument("ERR +: Matrix dimensions are incompatible for addition");
         }
 
-        int rows = a.Rows();
-        int cols = a.Cols();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                result(i, j) = a(i, j) + b(i, j);
+                result(i, j) = data[i * cols + j] + b(i, j);
             }
         }
 
         return result;
     }
 
-    Matrix operator-(const Matrix& a, const Matrix& b) 
+    Matrix operator-(const Matrix& b) 
     {
-        if (a.Rows() != b.Rows() || a.Cols() != b.Cols()) {
-            throw std::invalid_argument("Matrix dimensions are incompatible for addition");
+        if (rows != b.Rows() || cols != b.Cols()) {
+            throw std::invalid_argument("ERR -: Matrix dimensions are incompatible for addition");
         }
 
-        int rows = a.Rows();
-        int cols = a.Cols();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                result(i, j) = a(i, j) - b(i, j);
+                result(i, j) = data[i * cols + j] - b(i, j);
             }
         }
 
         return result;
     }
 
-    Matrix operator*(const Matrix& a, const Matrix& b) {
-        if (a.Cols() != b.Rows()) {
-            throw std::invalid_argument("Matrix dimensions are incompatible for multiplication");
+    Matrix operator*(const Matrix& b) {
+        if (cols != b.Rows()) {
+            throw std::invalid_argument("ERR *: Matrix dimensions are incompatible for multiplication");
         }
 
-        int m = a.Rows();
+        int m = rows;
         int n = b.Cols();
-        int p = a.Cols();
+        int p = cols;
         Matrix result(m, n);
 
         for (int i = 0; i < m; ++i) {
             for (int j = 0; j < n; ++j) {
                 double sum = 0.0;
                 for (int k = 0; k < p; ++k) {
-                    sum += a(i, k) * b(k, j);
+                    sum += data[i * cols + k] * b(k, j);
                 }
                 result(i, j) = sum;
             }
@@ -102,26 +98,37 @@ public:
         return result;
     }
 
-    Matrix I(const Matrix& A) {
-        if (A.Cols() != A.Rows()) {
-            throw std::invalid_argument("Inverse operation is valid only for square matrix.");
+    Matrix I(void) {
+        if (cols != rows) {
+            throw std::invalid_argument("ERR I: Inverse operation is valid only for square matrix.");
         }
-        if (A.Rows() > 2 || A.Cols() > 2) {
-            throw std::runtime_error("Inverse operation not supported for matrix size above 2x2.");
+        Matrix result(1, 1);
+        result(0, 0) = 1 / data[0];
+
+        switch(rows) {
+            default:
+                throw std::runtime_error("ERR I: Inverse operation not supported for matrix size above 2x2.");
+                break;
+            case 1:
+                break;
+            case 2:
+                double a = data[0];    // 0 * cols + 0 -- A(0, 0)
+                double b = data[1];    // 0 * cols + 1 -- A(0, 1)
+                double c = data[2];    // 1 * cols + 0 -- A(1, 0)
+                double d = data[3];    // 1 * cols + 1 -- A(1, 1)
+                double determinant = a * d - b * c;
+
+                if (determinant == 0.0) {       // TODO: Check equality with floats and doubles correctly.
+                    throw std::runtime_error("ERR I: Matrix is singular, cannot compute its inverse.");
+                }
+
+                Matrix result(2, 2);
+                result(0, 0) =  d / determinant;
+                result(0, 1) = -b / determinant;
+                result(1, 0) = -c / determinant;
+                result(1, 1) =  a / determinant;
+                break;
         }
-
-        double determinant = A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
-
-        if (determinant == 0.0) {
-            throw std::runtime_error("Matrix is singular, cannot compute its inverse.");
-        }
-
-        Matrix result(2, 2);
-        result(0, 0) =  A(1, 1) / determinant;
-        result(0, 1) = -A(0, 1) / determinant;
-        result(1, 0) = -A(1, 0) / determinant;
-        result(1, 1) =  A(0, 0) / determinant;
-
         return result;
     }
 
