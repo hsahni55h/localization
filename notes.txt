@@ -242,7 +242,6 @@ P = (I - KH)P'
 
 -------------------------------------------------------------------------------------------------------------
 
-
 KALMAN FILTER EQUATIONS
 
 
@@ -255,7 +254,6 @@ Measurement Update:
 
 y = z - Hx'
 S = HP'H^T + R
-
 
 Calculation of Kalman Gain:
 
