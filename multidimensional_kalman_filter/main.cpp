@@ -1,11 +1,6 @@
 #include <iostream>
-#include <math.h>
-#include <tuple>
 #include <vector>
-
-using namespace std;
-
-float measurements[3] = { 1, 2, 3 };
+#include <tuple>
 
 // Define a Matrix class to represent matrices and perform basic matrix operations
 class Matrix {
@@ -58,6 +53,23 @@ Matrix MatrixMultiply(const Matrix& a, const Matrix& b) {
     return result;
 }
 
+// Function to calculate the inverse of a 2x2 matrix
+Matrix MatrixInverse(const Matrix& A) {
+    double determinant = A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
+
+    if (determinant == 0.0) {
+        throw std::runtime_error("Matrix is singular, cannot compute its inverse.");
+    }
+
+    Matrix result(2, 2);
+    result(0, 0) = A(1, 1) / determinant;
+    result(0, 1) = -A(0, 1) / determinant;
+    result(1, 0) = -A(1, 0) / determinant;
+    result(1, 1) = A(0, 0) / determinant;
+
+    return result;
+}
+
 // Function to transpose a matrix
 Matrix MatrixTranspose(const Matrix& a) {
     int rows = a.Rows();
@@ -92,9 +104,32 @@ Matrix MatrixAdd(const Matrix& a, const Matrix& b) {
     return result;
 }
 
-// Kalman filter function signature
+// Kalman filter function
 std::pair<Matrix, Matrix> kalman_filter(const Matrix& x, const Matrix& P, const Matrix& u,
-                                       const Matrix& F, const Matrix& H, const Matrix& R, const Matrix& I);
+                                       const Matrix& F, const Matrix& H, const Matrix& R, const Matrix& I,
+                                       const std::vector<double>& measurements) {
+    for (size_t n = 0; n < measurements.size(); n++) {
+        // Measurement Update
+        Matrix Z(1, 1);
+        Z(0, 0) = measurements[n];
+
+        Matrix y = Z - MatrixMultiply(H, x); // Measurement residual
+
+        Matrix S = MatrixAdd(MatrixMultiply(H, MatrixMultiply(P, MatrixTranspose(H))), R); // Measurement covariance
+
+        // Calculate Kalman gain using MatrixInverse function
+        Matrix K = MatrixMultiply(P, MatrixMultiply(MatrixTranspose(H), MatrixInverse(S))); // Kalman gain
+
+        x = x + MatrixMultiply(K, y); // Update state estimate
+        P = P - MatrixMultiply(K, MatrixMultiply(H, P)); // Update covariance matrix
+
+        // Prediction
+        x = MatrixMultiply(F, x) + u; // Predict state
+        P = MatrixMultiply(F, MatrixMultiply(P, MatrixTranspose(F))); // Predict covariance
+    }
+
+    return std::make_pair(x, P);
+}
 
 int main() {
     // Initialize matrices
@@ -131,8 +166,11 @@ int main() {
     I(1, 0) = 0.0;
     I(1, 1) = 1.0;
 
-    // Call the Kalman filter function
-    std::pair<Matrix, Matrix> result = kalman_filter(x, P, u, F, H, R, I);
+    // Actual measurements data
+    std::vector<double> measurements = { 1.0, 2.0, 3.0 };
+
+    // Call the Kalman filter function with measurements data
+    std::pair<Matrix, Matrix> result = kalman_filter(x, P, u, F, H, R, I, measurements);
 
     // Print the results
     std::cout << "x=\n" << result.first(0, 0) << "\n" << result.first(1, 0) << "\n";
