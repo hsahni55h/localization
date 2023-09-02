@@ -1,0 +1,132 @@
+#include <vector>
+
+using namespace std;
+
+
+// Define a Matrix class to represent matrices and perform basic matrix operations
+class Matrix {
+public:
+    Matrix(int rows, int cols) : rows(rows), cols(cols), data(rows * cols) {}
+
+    double& operator()(int i, int j) {
+        return data[i * cols + j];
+    }
+    
+    double operator()(int i, int j) const {
+        return data[i * cols + j];
+    }
+    
+    int Rows() const {
+        return rows;
+    }
+
+    int Cols() const {
+        return cols;
+    }
+
+    Matrix operator+(const Matrix& a, const Matrix& b) {
+        if (a.Rows() != b.Rows() || a.Cols() != b.Cols()) {
+            throw std::invalid_argument("Matrix dimensions are incompatible for addition");
+        }
+
+        int rows = a.Rows();
+        int cols = a.Cols();
+        Matrix result(rows, cols);
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = a(i, j) + b(i, j);
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator-(const Matrix& a, const Matrix& b) 
+    {
+        if (a.Rows() != b.Rows() || a.Cols() != b.Cols()) {
+            throw std::invalid_argument("Matrix dimensions are incompatible for addition");
+        }
+
+        int rows = a.Rows();
+        int cols = a.Cols();
+        Matrix result(rows, cols);
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = a(i, j) - b(i, j);
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator*(const Matrix& a, const Matrix& b) {
+        if (a.Cols() != b.Rows()) {
+            throw std::invalid_argument("Matrix dimensions are incompatible for multiplication");
+        }
+
+        int m = a.Rows();
+        int n = b.Cols();
+        int p = a.Cols();
+        Matrix result(m, n);
+
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                double sum = 0.0;
+                for (int k = 0; k < p; ++k) {
+                    sum += a(i, k) * b(k, j);
+                }
+                result(i, j) = sum;
+            }
+        }
+
+        return result;
+    }
+    
+    void operator=(const Matrix& m1) 
+    {
+        rows = m1.rows;
+        cols = m1.cols;
+        data = m1.data;     // TODO: will this be shallow copy or deep copy?
+    }
+
+    Matrix T() 
+    {
+        Matrix result(cols, rows);
+        for(int i = 0; i < rows; ++i) {
+            for(int j = 0; j < cols; ++j) {
+                result(j, i) = data[i * cols + j];
+            }
+        }
+        return result;
+    }
+
+    Matrix I(const Matrix& A) {
+        if (A.Cols() != A.Rows()) {
+            throw std::invalid_argument("Inverse operation is valid only for square matrix.");
+        }
+        if (A.Rows() > 2 || A.Cols() > 2) {
+            throw std::runtime_error("Inverse operation not supported for matrix size above 2x2.");
+        }
+
+        double determinant = A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
+
+        if (determinant == 0.0) {
+            throw std::runtime_error("Matrix is singular, cannot compute its inverse.");
+        }
+
+        Matrix result(2, 2);
+        result(0, 0) =  A(1, 1) / determinant;
+        result(0, 1) = -A(0, 1) / determinant;
+        result(1, 0) = -A(1, 0) / determinant;
+        result(1, 1) =  A(0, 0) / determinant;
+
+        return result;
+    }
+
+private:
+    int rows;
+    int cols;
+    vector<double> data;
+};
