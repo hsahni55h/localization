@@ -1,0 +1,8 @@
+# Ignore executables
+*.o
+*.out
+
+# Ignore the "build" directory
+/build/
+
+#.vscode/
