@@ -227,7 +227,25 @@ void visualization(int n, Robot robot, int step, Robot p[], Robot pr[])
 //####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER CODE BELOW ####
 int main()
 {
-    cout << "I am ready for coding the MCL!" << endl;
+    // Instantiating a robot object from the Robot class
+    Robot myrobot;
+
+    // TODO: Set robot new position to x=10.0, y=10.0 and orientation=0
+    // Fill in the position and orientation values in myrobot.set() function
+    myrobot.set(10.0, 10.0, 0);
+
+    // Printing out the new robot position and orientation
+    cout << myrobot.show_pose() << endl;
+
+    // TODO: Rotate the robot by PI/2.0 and then move him forward by 10.0
+    // Use M_PI for the pi value
+    myrobot.move(M_PI / 2, 10.0);
+
+    // TODO: Print out the new robot position and orientation
+    cout << myrobot.show_pose() << endl;
+
+    // Printing the distance from the robot toward the eight landmarks
+    cout << myrobot.read_sensors() << endl;
 
     return 0;
 }
